@@ -1,0 +1,56 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+html{
+    box-sizing: border-box;
+}
+body{
+    text-align: center;
+    margin: 0;
+    min-height: 100vh;
+    font-family: myFont, sans-serif;
+}
+@font-face {
+    font-family: "myFont";
+    src: url(./font/GreatVibes-Regular.ttf);
+    font-weight: 400;
+}
+.header{
+    position: sticky;
+    background-color:#fff;
+    z-index: 99;
+    top: 0;
+    font-size: 60px;
+    letter-spacing: 3px;
+}
+.loader{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(255,255,255,0.8);
+}
+.loader img{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+.image_container{
+    margin: 10px 15%;
+}
+.image_container img{
+    margin-top: 10px;
+    width: 100%;
+}
+/* Media Query */
+@media (max-width:600px ) {
+    .header{
+        font-size: 20px;
+    }
+    .image_container{
+        margin: 10px 2%;
+    }
+}
