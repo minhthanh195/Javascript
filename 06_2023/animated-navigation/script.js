@@ -1,17 +1,11 @@
 const menuBars = document.getElementById("menu-bars");
 const overlay = document.getElementById("overlay");
-const nav1 = document.getElementById('nav-1');
-const nav2 = document.getElementById('nav-2');
-const nav3 = document.getElementById('nav-3');
-const nav4 = document.getElementById('nav-4');
-const nav5 = document.getElementById('nav-5');
-const navList = [nav1,nav2,nav3,nav4,nav5]
+const navList = document.querySelectorAll(".nav-item")
 // Control Navigation Animation
 function navAnimation(direc1,direc2) {
     navList.forEach((nav,i)=>{
         console.log(nav)
         nav.classList.replace(`slide-${direc1}-${i+1}`,`slide-${direc2}-${i+1}`)
-    
     })
 }
 function toggleNav(){
