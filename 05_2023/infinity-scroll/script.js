@@ -56,10 +56,9 @@ async function getPhotos(){
     try{
         const response = await fetch(apiUrl);
         photosArray = await response.json();
-        console.log(photosArray)
-        if(initialLoad){
+        if(isInitialLoad){
             updateApiUrl(30);
-            initialLoad = false;
+            isInitialLoad = false;
         }
         displayPhoto()
     }catch(error){
