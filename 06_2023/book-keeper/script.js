@@ -29,21 +29,61 @@ function validate(nameValue,urlValue){
     // valid
     return true
 }
+// buidBookmarks 
+function buildBookmarks() {
+    // remove all bookmark elements
+    bookmarksContainer.textContent='';
+    // bulid items
+    bookmarks.forEach(bookmark => {
+        const {name, url} = bookmark
+        const item = document.createElement('div')
+        item.classList.add('item')
+        const closeIcon = document.createElement('i')
+        closeIcon.classList.add('fas', 'fa-times')
+        closeIcon.setAttribute('onclick',`deleteBookmark('${url}')`);
+        // favicon / link container
+        const linkInfo = document.createElement('div');
+        linkInfo.classList.add('name');
+        // Favicon
+        const favicon = document.createElement('img');
+        favicon.setAttribute('src',`https://s2.googleusercontent.com/s2/favicons?domain=${url}`)
+        favicon.setAttribute('alt', 'favicon');
+        // link
+        const link = document.createElement('a');
+        link.setAttribute('href',`${url}`);
+        link.setAttribute('target','_blank');
+        link.textContent = name;
+        // append to bookmarks container
+        linkInfo.append(favicon,link);
+        item.append(closeIcon,linkInfo);
+        bookmarksContainer.appendChild(item);
+    });
+}
 // fetch bookmarks
 function fetchBookmarks(){
     if(localStorage.getItem('bookmarks')){
         bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
     }else{
         // Create bookmarks array in localStorage
-        bookmarks = [
+        bookmarks = {
             {
                 name:'Hoang Minh Thanh',
                 url:'google.com'
             }
-        ]
+        }
         localStorage.setItem('bookmarks',JSON.stringify(bookmarks));
     }
-    console.log(bookmarks)
+    buildBookmarks()
+}
+// delete bookmark
+function deleteBookmark(url){
+    bookmarks.forEach((bookmark,i) =>{
+        if(bookmark.url === url){
+            bookmarks.splice(i,1);
+        }
+    });
+    localStorage.setItem('bookmarks',JSON.stringify(bookmarks));
+    fetchBookmarks();
 }
 
 // handle data from form
@@ -68,10 +108,12 @@ function storeBookmart(e){
     websiteNameEl.focus();
 }
 
+function closeModal () {
+    window.addEventListener('click',(e) => {e.target === modal ? modal.classList.remove('show-modal') : false})
+}
 // Add Eventlistener
 modalShow.addEventListener('click',showModal)
 modalClose.addEventListener('click',()=>modal.classList.remove('show-modal'));
-window.addEventListener('click',(e) => {e.target === modal ? modal.classList.remove('show-modal') : false})
 bookmarkForm.addEventListener('submit',storeBookmart)
 
 // on load , fetch bookmarks 

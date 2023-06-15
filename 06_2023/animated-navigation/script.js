@@ -4,7 +4,6 @@ const navList = document.querySelectorAll(".nav-item")
 // Control Navigation Animation
 function navAnimation(direc1,direc2) {
     navList.forEach((nav,i)=>{
-        console.log(nav)
         nav.classList.replace(`slide-${direc1}-${i+1}`,`slide-${direc2}-${i+1}`)
     })
 }
