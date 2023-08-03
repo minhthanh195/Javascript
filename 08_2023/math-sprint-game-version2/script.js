@@ -13,9 +13,9 @@ const countdown = document.querySelector('.countdown');
 // Game Page
 const itemContainer = document.querySelector('.item-container');
 // Score Page
-const finalTimeEl = document.querySelector('.final-time');
-const baseTimeEl = document.querySelector('.base-time');
-const penaltyTimeEl = document.querySelector('.penalty-time');
+const finalScoreEl = document.querySelector('.your-scores');
+// const baseTimeEl = document.querySelector('.base-time');
+// const penaltyTimeEl = document.querySelector('.penalty-time');
 const playAgainBtn = document.querySelector('.play-again');
 
 // Equations
@@ -29,12 +29,7 @@ let equationObject = {};
 const wrongFormat = [];
 
 // Time
-let timer;
-let timePlayed = 0;
-let baseTime = 0;
-let penaltyTime = 0;
-let finalTime = 0;
-let finalTimeDisplay = '0.0';
+let yourScores = 0 ;
 // Scroll
 let valueY = 0 ;
 // refresh splash page best scores
@@ -98,50 +93,44 @@ function showScorePage(){
 }
 // format & display time in DOM
 function scoresToDOM(){
-  finalTimeDisplay = finalTime.toFixed(1);
-  baseTime= timePlayed.toFixed(1);
-  penaltyTime = penaltyTime.toFixed(1);
-  baseTimeEl.textContent = `Base Time : ${baseTime}`
-  penaltyTimeEl.textContent = `Penalty: +${penaltyTime}s`
-  finalTimeEl.textContent = `${finalTimeDisplay}s`
-  updateBestScore();
+  finalScoreEl.textContent = `${yourScores}`
+  // updateBestScore();
   // scroll to Top, go to Score Page
   itemContainer.scrollTo({top:0, behavior:'instant'});
   showScorePage();
 }
 
 // stop timer, process results
-function checkTime(){
+function checkPoint(){
   // console.log(playerGuessArray.length)
   if(playerGuessArray.length == questionAmount){
-    clearInterval(timer)
     // check for wrong guesses , add penalty time
     equationsArray.forEach((equation,index)=>{
       if(equation.evaluated === playerGuessArray[index]){
-        // corredt guess , no penalty
-      }else{
-        // incorrect guess, add penalty
-        penaltyTime += 0.5;
+        yourScores++
+      }
+      else{
+        yourScores
       }
     })
-    finalTime = timePlayed + penaltyTime;
     scoresToDOM();
+    
   }
 }
 // add a tenth of a second to timeplayed
-function addTime(){
-  timePlayed += 0.1;
-  checkTime();
-}
+// function addTime(){
+//   timePlayed += 0.1;
+//   checkPoint();
+// }
 // start timer when game page is clicked
-function startTimer(){
-  // reset Time
-  timePlayed = 0;
-  penaltyTime = 0;
-  finalTime = 0;
-  timer = setInterval(addTime,100);
-  gamePage.removeEventListener('click',startTimer);
-}
+// function startTimer(){
+//   // reset Time
+//   timePlayed = 0;
+//   penaltyTime = 0;
+//   finalTime = 0;
+//   timer = setInterval(addTime,100);
+//   gamePage.removeEventListener('click',startTimer);
+// }
 // scroll, store user selection in playerGuessArray
 function select (guessedTrue){
   // scroll 80px
@@ -230,7 +219,7 @@ function populateGamePage() {
 
 // count down 3,2,1 g0g0
 function countdownStart(){
-  let count = 10;
+  let count = 3;
   countdown.textContent = count;
   const setIntervalCountDown = setInterval(()=>{
     count--;
@@ -291,7 +280,7 @@ startForm.addEventListener('click',()=>{
 
 // event listeners
 startForm.addEventListener('submit',slectQuestionAmount);
-gamePage.addEventListener('click',startTimer);
+// gamePage.addEventListener('click',startTimer);
 
 // on load
 getSavedBestScores();
