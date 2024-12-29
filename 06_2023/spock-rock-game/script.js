@@ -152,5 +152,19 @@ function displayComputerChoice(){
   }
 }
 
+var parent = document.getElementById('parent')
+var child = document.getElementById('child')
+
+parent.addEventListener('click', () => {
+  console.log('Parent (capturing)');
+},true)
+
+child.addEventListener('click', () => {
+  console.log('Parent (bubbling)');
+})
+
+parent.addEventListener('click', () => {
+  console.log('Parent (bubbling)');
+})
 // on starup, set initial values
 resetAll();
