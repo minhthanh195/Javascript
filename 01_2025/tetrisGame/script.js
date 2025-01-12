@@ -187,8 +187,21 @@ const KEY_CODES = {
   DOWN: 'ArrowDown',
 };
 
+const LOCAL_STORAGE = {
+  SPEED : 0,
+  HIGHT_SCORE : 0,
+}
+
+const LOCAL_STORAGE_INFO = JSON.parse(localStorage.getItem('INFO'));
+if (LOCAL_STORAGE_INFO) {
+  document.getElementById('hight-score').innerHTML = LOCAL_STORAGE_INFO.HIGHT_SCORE;
+  board.hightScore = LOCAL_STORAGE.HIGHT_SCORE;
+}
+
 const canvas = document.getElementById('board');
 const ctx  = canvas.getContext('2d');
+let speedEl = document.getElementById('speed');
+let refresh;
 
 ctx.canvas.width = COLS * BLOCK_SIZE;
 ctx.canvas.height = ROWS * BLOCK_SIZE;
@@ -197,8 +210,10 @@ class Board {
   constructor (ctx) {
     this.ctx = ctx;
     this.grid = this.generateWhiteBoard();
+    this.hightScore = LOCAL_STORAGE.HIGHT_SCORE;
     this.score = 0;
     this.gameOver = false;
+    this.speed = speedEl.value;
     // this.isPlaying = false;
   }
 
@@ -225,7 +240,7 @@ class Board {
     const latestGrid = board.grid.filter((row) => {
       return row.some((col) => col === WHITE_COLOR_ID)
     })
-
+    
     const newScore = ROWS - latestGrid.length;
     const newRows = Array.from({length: newScore}, () => Array(COLS).fill(WHITE_COLOR_ID))
     
@@ -238,10 +253,16 @@ class Board {
   handleScore(newScore) {
     this.score += newScore;
     document.getElementById('score').innerHTML = this.score
+    if(this.score > this.hightScore) {
+      document.getElementById('hight-score').innerHTML = this.score
+      LOCAL_STORAGE.HIGHT_SCORE = this.score;
+      localStorage.setItem('INFO', JSON.stringify(LOCAL_STORAGE));
+    }
   }
 
   handleGameOver() {
     this.gameOver = true;
+    clearInterval(refresh)
     alert('Game Over!!!')
   }
 
@@ -257,14 +278,19 @@ class Board {
 }
 
 document.getElementById('play-btn').addEventListener('click', () => {
-  board.resetBoard()
-  const refresh = setInterval(() => {
-    if(!board.gameOver) {
+  board.resetBoard();
+  if(!board.gameOver) {
+    generateNewBrick()
+    clearInterval(refresh)
+     refresh = setInterval(() => {
       brick.moveDown()
-    } else {
-      clearInterval(refresh)
-    }
-  },1000)
+    },board.speed)
+  }
+})
+document.getElementById('speed').addEventListener('change', function() {
+  board.speed = this.value;
+  LOCAL_STORAGE.SPEED = this.value;
+  localStorage.setItem('INFO', JSON.stringify(LOCAL_STORAGE));
 })
 
 class Brick {
@@ -273,7 +299,7 @@ class Brick {
     this.layout = BRICK_LAYOUT[id];
     this.activeIndex = 0;
     this.colPos = 3;
-    this.rowPos = -3;
+    this.rowPos = -4;
   }
 
   draw() {
@@ -295,7 +321,7 @@ class Brick {
       }
     }
   }
-  
+
   moveLeft() {
     if(!this.checkCollision(this.rowPos,this.colPos - 1,this.layout[this.activeIndex])) {
       this.clear()
@@ -363,16 +389,14 @@ function generateNewBrick() {
   brick = new Brick(Math.floor(Math.random()*10) % BRICK_LAYOUT.length);
 }
 
-
-
 board = new Board(ctx);
 board.drawBoard();
-generateNewBrick()
+generateNewBrick();
 brick.draw();
 brick.rotate();
 
 document.addEventListener('keydown',(e) => {
-  if(!board.gameOver) {
+  if(!board.gameOver && (brick.rowPos >= 0)) {
     switch(e.code) {
       case KEY_CODES.LEFT:
         brick.moveLeft();
