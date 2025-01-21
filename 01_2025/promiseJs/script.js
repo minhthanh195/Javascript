@@ -27,11 +27,9 @@ var callBackXmlHttp = function(theUrl, resolve) {
  
 
 var initTestPromise = new Promise((resolve,reject) => {
-  const condition = true;
   if (true) {
     callBackXmlHttp('https://picsum.photos/200/300',resolve)
   } else {
-    reject('khong thanh cong')
   }
 })
 

@@ -119,7 +119,7 @@ function checkTime(){
     equationsArray.forEach((equation,index)=>{
       if(equation.evaluated === playerGuessArray[index]){
         // corredt guess , no penalty
-      }else{
+      }else {
         // incorrect guess, add penalty
         penaltyTime += 0.5;
       }
@@ -147,7 +147,7 @@ function select (guessedTrue){
   // scroll 80px
   valueY +=80;
   itemContainer.scroll(0,valueY);
-  // add palyer guess to array
+  // add player guess to array
   return guessedTrue ? playerGuessArray.push('true') : playerGuessArray.push('false')
 }
 // displays game page 
@@ -230,7 +230,7 @@ function populateGamePage() {
 
 // count down 3,2,1 g0g0
 function countdownStart(){
-  let count = 10;
+  let count = 3;
   countdown.textContent = count;
   const setIntervalCountDown = setInterval(()=>{
     count--;

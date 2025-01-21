@@ -27,6 +27,8 @@ let firstNumber = 0;
 let secondNumber = 0;
 let equationObject = {};
 const wrongFormat = [];
+let finalTimeDisplay = '0.0';
+
 
 // Time
 let yourScores = 0 ;
@@ -93,8 +95,13 @@ function showScorePage(){
 }
 // format & display time in DOM
 function scoresToDOM(){
-  finalScoreEl.textContent = `${yourScores}`
-  // updateBestScore();
+  finalTimeDisplay = finalTime.toFixed(1);
+  baseTime= timePlayed.toFixed(1);
+  penaltyTime = penaltyTime.toFixed(1);
+  baseTimeEl.textContent = `Base Time : ${baseTime}`
+  penaltyTimeEl.textContent = `Penalty: +${penaltyTime}s`
+  finalTimeEl.textContent = `${finalTimeDisplay}s`
+  updateBestScore();
   // scroll to Top, go to Score Page
   itemContainer.scrollTo({top:0, behavior:'instant'});
   showScorePage();

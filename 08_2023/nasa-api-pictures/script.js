@@ -18,10 +18,10 @@ function showContent(page){
         top:0,
         behavior: 'instant',
     })
-    if(page === 'result'){
-        resultsNav.classList.remove('hidden')
-        favoriteNav.classList.add('hidden')
-    }
+    // if(page === 'result'){
+    //     resultsNav.classList.remove('hidden')
+    //     favoriteNav.classList.add('hidden')
+    // }
 }
 function creatDOMNodes(page){
     const currentArray = page === 'result' ? resultsArray : Object.values(favorites);
@@ -94,7 +94,7 @@ async function getNasaPictures(){
         const response = await fetch(apiUrl);
         resultsArray = await response.json();
         updateDOM('result')
-    }catch(error){
+    } catch(error){
         // catch error here
     }
 }
