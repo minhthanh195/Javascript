@@ -41,10 +41,10 @@ function getSavedColumns() {
 
 // Set localStorage Arrays
 function updateSavedColumns() {
-  listArrays = [backlogListArray,progressListArray,completeListArray,onHoldListArray]
-  const arrayNames = ['backlog','progress','complete','onHold'];
-  arrayNames.forEach((arrayName,index) => {
-    localStorage.setItem(`${arrayName}Items`,JSON.stringify(listArrays[index]))
+  listArrays = [backlogListArray, progressListArray, completeListArray, onHoldListArray]
+  const arrayNames = ['backlog', 'progress', 'complete', 'onHold'];
+  arrayNames.forEach((arrayName, index) => {
+    localStorage.setItem(`${arrayName}Items`, JSON.stringify(listArrays[index]))
   })
 }
 
@@ -59,15 +59,15 @@ function filterArray(array) {
 function updateItem(dataTarget, column) {
   const selectedArray = listArrays[column];
   const selectedColumnEl = listColumns[column].children;
-  
-  // if (!dragging) {
-  // }
-  if (selectedColumnEl[dataTarget].textContent === '') {
-    delete selectedArray[dataTarget];
-  } else {
-    selectedArray[dataTarget] = selectedColumnEl[dataTarget].textContent;
+
+  if (!dragging) {
+    if (selectedColumnEl[dataTarget].textContent === '') {
+      delete selectedArray[dataTarget];
+    } else {
+      selectedArray[dataTarget] = selectedColumnEl[dataTarget].textContent;
+    }
+    updateDOM();
   }
-  updateDOM();
 }
 
 // Create DOM Elements for each list item
@@ -79,7 +79,7 @@ function createItemEl(columnEl, column, item, index) {
   listEl.draggable = true;
   listEl.setAttribute('ondrag', "dragStart(event)");
   listEl.setAttribute('ondragend', "dragEnd(event)");
-  listEl.setAttribute('contenteditable',true);
+  listEl.setAttribute('contenteditable', true);
   listEl.setAttribute('onfocusout', `updateItem(${index},${column})`);
 
   columnEl.appendChild(listEl);
@@ -88,7 +88,7 @@ function createItemEl(columnEl, column, item, index) {
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
 function updateDOM() {
   // Check localStorage once
-  if(!updateOnLoad) {
+  if (!updateOnLoad) {
     getSavedColumns();
   }
 
@@ -96,28 +96,28 @@ function updateDOM() {
   backlogList.textContent = '';
   backlogListArray = filterArray(backlogListArray)
   backlogListArray.forEach((backlogItem, index) => {
-    createItemEl(backlogList, 0, backlogItem,index)
+    createItemEl(backlogList, 0, backlogItem, index)
   })
 
   // Progress Column
   progressList.textContent = '';
-  progressListArray =  filterArray(progressListArray)
+  progressListArray = filterArray(progressListArray)
   progressListArray.forEach((progressItem, index) => {
-    createItemEl(progressList, 1, progressItem,index);
+    createItemEl(progressList, 1, progressItem, index);
   })
 
   // Complete Column
   completeList.textContent = '';
   completeListArray = filterArray(completeListArray)
   completeListArray.forEach((completeItem, index) => {
-    createItemEl(completeList, 2, completeItem,index)
+    createItemEl(completeList, 2, completeItem, index)
   })
 
   // On Hold Column
   onHoldList.textContent = '';
   onHoldListArray = filterArray(onHoldListArray)
   onHoldListArray.forEach((onHoldItem, index) => {
-    createItemEl(onHoldList, 3, onHoldItem,index)
+    createItemEl(onHoldList, 3, onHoldItem, index)
   })
 
 
@@ -126,15 +126,15 @@ function updateDOM() {
 }
 
 // add item to column list, reset input
-  function addItem(column) {
-    const text = addItemContainers[column].textContent;
+function addItem(column) {
+  const text = addItemContainers[column].textContent;
 
-    if(!text) return;
+  if (!text) return;
 
-    listArrays[column].push(text);
-    addItemContainers[column].textContent = '';
-    updateDOM();
-  }
+  listArrays[column].push(text);
+  addItemContainers[column].textContent = '';
+  updateDOM();
+}
 
 // hide/ show add item area
 function handleAddItem(column) {
@@ -179,12 +179,13 @@ rebuildArrays = function () {
 // when item starts dragging
 function drop(e) {
   e.preventDefault();
+
   const parent = listColumns[currentColumn];
-  console.log(parent);
-  
+
   parent.appendChild(draggingItem);
-  dragging = false;
   rebuildArrays();
+  updateDOM();
+  dragging = false;
 }
 
 function dragOver(e) {
@@ -207,6 +208,9 @@ function dragStart(e) {
 }
 
 function dragEnd(e) {
+  listColumns.forEach((column) => {
+    column.classList.remove('over');
+  })
 }
 
 updateDOM()

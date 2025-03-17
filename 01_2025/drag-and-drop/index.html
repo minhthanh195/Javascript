@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,21 +8,23 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <h1 class="main-title">Kanban Board</h1>
     <div class="drag-container">
         <ul class="drag-list">
             <!-- Backlog Column -->
-            <li class="drag-column backlog-column" ondrop="drop(event)" ondragover="dragOver(event)" ondragenter ="dragEnter(0)">
+            <li class="drag-column backlog-column" ondrop="drop(event)" ondragover="dragOver(event)"
+                ondragenter="dragEnter(0)">
                 <span class="header">
                     <h2>Backlog</h2>
                 </span>
-            <!-- Backlog Content -->
+                <!-- Backlog Content -->
                 <div id="backlog-content" class="custom-scroll">
                     <ul class="drag-item-list" id="backlog-list">
                     </ul>
                 </div>
-            <!-- Add Button Group -->
+                <!-- Add Button Group -->
                 <div class="add-btn-group">
                     <div class="add-btn" onclick="handleAddItem(0)">
                         <span class="plus-sign">+</span>
@@ -36,16 +39,17 @@
                 </div>
             </li>
             <!-- progress Column -->
-            <li class="drag-column progress-column" ondrop="drop(event)" ondragover="dragOver(event)" ondragenter ="dragEnter(1)">
+            <li class="drag-column progress-column" ondrop="drop(event)" ondragover="dragOver(event)"
+                ondragenter="dragEnter(1)">
                 <span class="header">
                     <h2>progress</h2>
                 </span>
-            <!-- progress Content -->
+                <!-- progress Content -->
                 <div id="progress-content" class="custom-scroll">
                     <ul class="drag-item-list" id="progress-list">
                     </ul>
                 </div>
-            <!-- Add Button Group -->
+                <!-- Add Button Group -->
                 <div class="add-btn-group">
                     <div class="add-btn" onclick="handleAddItem(1)">
                         <span class="plus-sign">+</span>
@@ -60,16 +64,17 @@
                 </div>
             </li>
             <!-- complete Column -->
-            <li class="drag-column complete-column" ondrop="drop(event)" ondragover="dragOver(event)" ondragenter="dragEnter(2)">
+            <li class="drag-column complete-column" ondrop="drop(event)" ondragover="dragOver(event)"
+                ondragenter="dragEnter(2)">
                 <span class="header">
                     <h2>complete</h2>
                 </span>
-            <!-- complete Content -->
+                <!-- complete Content -->
                 <div id="complete-content" class="custom-scroll">
                     <ul class="drag-item-list" id="complete-list">
                     </ul>
                 </div>
-            <!-- Add Button Group -->
+                <!-- Add Button Group -->
                 <div class="add-btn-group">
                     <div class="add-btn" onclick="handleAddItem(2)">
                         <span class="plus-sign">+</span>
@@ -84,16 +89,17 @@
                 </div>
             </li>
             <!-- progress Column -->
-            <li class="drag-column on-hold-column" ondrop="drop(event)" ondragover="dragOver(event)" ondragenter="dragEnter(3)">
+            <li class="drag-column on-hold-column" ondrop="drop(event)" ondragover="dragOver(event)"
+                ondragenter="dragEnter(3)">
                 <span class="header">
                     <h2>on-hold</h2>
                 </span>
-            <!-- on-hold Content -->
+                <!-- on-hold Content -->
                 <div id="on-hold-content" class="custom-scroll">
                     <ul class="drag-item-list" id="on-hold-list">
                     </ul>
                 </div>
-            <!-- Add Button Group -->
+                <!-- Add Button Group -->
                 <div class="add-btn-group">
                     <div class="add-btn" onclick="handleAddItem(3)">
                         <span class="plus-sign">+</span>
@@ -112,4 +118,5 @@
     <!-- Script -->
     <script src="script.js"></script>
 </body>
+
 </html>
