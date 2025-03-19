@@ -14,12 +14,19 @@
     <div class="drag-container">
         <ul class="drag-list">
             <!-- Backlog Column -->
-            <li class="drag-column backlog-column" ondrop="drop(event)" ondragover="dragOver(event)"
+            <li class="drag-column backlog-column" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"
                 ondragenter="dragEnter(0)">
-                    <h2 class="header">Backlog</h2>
+                <h2 class="header">Backlog</h2>
                 <!-- Backlog Content -->
                 <div id="backlog-content" class="custom-scroll">
                     <ul class="drag-item-list" id="backlog-list">
+                        <li class="drag-item">
+                            <span class="drag-text">item 1</span>
+                            <div class="drag-options">
+                                <button type="button" class="drag-btn edit">edit</button>
+                                <button type="button" class="drag-btn ">remove</button>
+                            </div>
+                        </li>
                     </ul>
                 </div>
                 <!-- Add Button Group -->
@@ -32,14 +39,14 @@
                         <span>Save Item</span>
                     </button>
                 </div>
-                <div class="add-container" contenteditable="true">
+                <div class="add-container">
                     <textarea class="add-item"></textarea>
                 </div>
             </li>
             <!-- progress Column -->
-            <li class="drag-column progress-column" ondrop="drop(event)" ondragover="dragOver(event)"
+            <li class="drag-column progress-column" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"
                 ondragenter="dragEnter(1)">
-                    <h2 class="header">progress</h2>
+                <h2 class="header">progress</h2>
                 <!-- progress Content -->
                 <div id="progress-content" class="custom-scroll">
                     <ul class="drag-item-list" id="progress-list">
@@ -55,14 +62,14 @@
                         <span>Save Item</span>
                     </button>
                 </div>
-                <div class="add-container" contenteditable="true">
+                <div class="add-container">
                     <textarea class="add-item"></textarea>
                 </div>
             </li>
             <!-- complete Column -->
-            <li class="drag-column complete-column" ondrop="drop(event)" ondragover="dragOver(event)"
+            <li class="drag-column complete-column" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"
                 ondragenter="dragEnter(2)">
-                    <h2 class="header">complete</h2>
+                <h2 class="header">complete</h2>
                 <!-- complete Content -->
                 <div id="complete-content" class="custom-scroll">
                     <ul class="drag-item-list" id="complete-list">
@@ -78,14 +85,14 @@
                         <span>Save Item</span>
                     </button>
                 </div>
-                <div class="add-container" contenteditable="true">
+                <div class="add-container">
                     <textarea class="add-item"></textarea>
                 </div>
             </li>
             <!-- progress Column -->
-            <li class="drag-column on-hold-column" ondrop="drop(event)" ondragover="dragOver(event)"
+            <li class="drag-column on-hold-column" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"
                 ondragenter="dragEnter(3)">
-                    <h2 class="header">on-hold</h2>
+                <h2 class="header">on-hold</h2>
                 <!-- on-hold Content -->
                 <div id="on-hold-content" class="custom-scroll">
                     <ul class="drag-item-list" id="on-hold-list">
@@ -101,7 +108,7 @@
                         <span>Save Item</span>
                     </button>
                 </div>
-                <div class="add-container" contenteditable="true">
+                <div class="add-container">
                     <textarea class="add-item"></textarea>
                 </div>
             </li>

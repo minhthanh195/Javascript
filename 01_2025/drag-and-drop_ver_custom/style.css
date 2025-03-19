@@ -132,6 +132,10 @@ ul {
 }
 
 .drag-item {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
   margin: 10px;
   padding: 10px;
   height: fit-content;
@@ -216,6 +220,10 @@ ul {
 
 .add-item:focus {
   outline: none;
+}
+
+.edit-input {
+  flex: 1;
 }
 
 /* Media Query: Laptop */
