@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Board</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="style1.css">
+</head>
+
+<body>
+  <h1 class="main-title">Kanban Board</h1>
+  <div class="drag-container">
+    <ul class="drag-list">
+
+      <li class="drag-column backlog-column" data-column="0">
+        <h2 class="header">Backlog</h2>
+        <div class="custom-scroll">
+          <ul class="drag-item-list"></ul>
+        </div>
+        <div class="add-btn-group">
+          <button class="add-btn" data-add="0">+ Add Item</button>
+          <button class="add-btn solid" data-save="0" style="display:none;">Save Item</button>
+        </div>
+        <div class="add-container" style="display:none;">
+          <textarea class="add-item"></textarea>
+        </div>
+      </li>
+
+      <li class="drag-column progress-column" data-column="1">
+        <h2 class="header">Progress</h2>
+        <div class="custom-scroll">
+          <ul class="drag-item-list"></ul>
+        </div>
+        <div class="add-btn-group">
+          <button class="add-btn" data-add="1">+ Add Item</button>
+          <button class="add-btn solid" data-save="1" style="display:none;">Save Item</button>
+        </div>
+        <div class="add-container" style="display:none;">
+          <textarea class="add-item"></textarea>
+        </div>
+      </li>
+
+      <li class="drag-column complete-column" data-column="2">
+        <h2 class="header">Complete</h2>
+        <div class="custom-scroll">
+          <ul class="drag-item-list"></ul>
+        </div>
+        <div class="add-btn-group">
+          <button class="add-btn" data-add="2">+ Add Item</button>
+          <button class="add-btn solid" data-save="2" style="display:none;">Save Item</button>
+        </div>
+        <div class="add-container" style="display:none;">
+          <textarea class="add-item"></textarea>
+        </div>
+      </li>
+
+      <li class="drag-column on-hold-column" data-column="3">
+        <h2 class="header">On Hold</h2>
+        <div class="custom-scroll">
+          <ul class="drag-item-list"></ul>
+        </div>
+        <div class="add-btn-group">
+          <button class="add-btn" data-add="3">+ Add Item</button>
+          <button class="add-btn solid" data-save="3" style="display:none;">Save Item</button>
+        </div>
+        <div class="add-container" style="display:none;">
+          <textarea class="add-item"></textarea>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+
+  <script src="script1.js"></script>
+</body>
+
+</html>

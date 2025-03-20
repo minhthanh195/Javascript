@@ -13,6 +13,7 @@ const onHoldList = document.getElementById('on-hold-list');
 
 // Items
 let updateOnLoad = false;
+let dragging = false;
 
 // Initialize Arrays
 let backlogListArray = [];
@@ -24,7 +25,8 @@ let listArrays = [];
 // Drag Functionality
 let draggingItem;
 let currentColumn;
-let dragging = false;
+let targetPosition;
+let saveOffset;
 
 // Get Arrays from localStorage if available, set default values if not
 function getSavedColumns() {
@@ -153,7 +155,7 @@ function handleSaveItem(column) {
   addItem(column);
 }
 
-// allow arays to reflect drag and drop items
+// allow arrays to reflect drag and drop items
 rebuildArrays = function () {
   backlogListArray = [];
   progressListArray = [];
@@ -177,14 +179,19 @@ rebuildArrays = function () {
   }
 }
 
-
 // when item starts dragging
 function drop(e) {
   e.preventDefault();
 
   const parent = listColumns[currentColumn];
-
   parent.appendChild(draggingItem);
+
+  if (saveOffset > 0) {
+    targetPosition.after(draggingItem); 
+  } else {
+    targetPosition.before(draggingItem); 
+  }
+
   rebuildArrays();
   updateDOM();
   dragging = false;
@@ -195,6 +202,7 @@ function dragOver(e) {
 }
 
 function dragEnter(column) {
+
   listColumns.forEach((column) => {
     column.classList.remove('over');
   })
@@ -214,26 +222,21 @@ function dragOver(e) {
   const target = e.target;
   const dragItem = document.querySelectorAll('.drag-item');
 
-  console.log(dragItem);
-  
   if (target && target !== draggingItem && target.classList.contains('drag-item')) {
     const rect = target.getBoundingClientRect();
-    const offset = e.clientY - rect.top - rect.height / 2;
-    
-    if (offset > 0) {
-      dragItem.forEach((item) => {
-        item.style.borderBottom= 'none';
-      })
-      // target.style.borderBottom = 'solid 2px red';
-      // target.siblings.style.borderTop = 'none';
-      // target.after(draggingItem); // kéo xuống dưới
+    saveOffset = e.clientY - rect.top - rect.height / 2;
+
+    dragItem.forEach((item) => {
+      item.style.borderBottom = 'none';
+      item.style.borderTop = 'none';
+    })
+
+    if (saveOffset > 0) {
+      target.style.borderBottom = 'solid 2px red';
+      targetPosition = target;
     } else {
-      dragItem.forEach((item) => {
-        item.style.borderTop= 'none';
-      })
-      // target.style.borderTop = 'solid 2px red';
-      // target.siblings.style.borderTop = 'none';
-      // target.before(draggingItem); // kéo lên trên
+      target.style.borderTop = 'solid 2px red';
+      targetPosition = target;
     }
   }
 }
@@ -244,59 +247,53 @@ function dragEnd(e) {
   })
 }
 
-listColumns.forEach(function(element, index ){
-  element.addEventListener('click',function(e) {
-    if(e.target.classList.contains('edit')) {
+listColumns.forEach(function (element, index) {
+  element.addEventListener('click', function (e) {
+    if (e.target.classList.contains('edit')) {
       const parent = e.target.closest('.drag-item');
       const spanText = parent.querySelector('.drag-text');
       const currentText = spanText.textContent;
       const input = document.createElement('input');
 
       input.type = 'text';
-
-      // Chuyển text hiện tại của span thành giá trị của input
       input.value = currentText;
       input.classList.add('edit-input');
-
-      // chuyển span thành input
       parent.replaceChild(input, spanText);
       input.focus();
-      
-      // Biến này đặt ra để kiểm tra xem có phải ấn nút esc không
+
       let isKeyEsc = false;
 
       const finishEdit = () => {
-        if(isKeyEsc) return;
+        if (isKeyEsc) return;
 
         const newText = input.value.trim();
 
-        if(newText !== '') {
+        if (newText !== '') {
           spanText.textContent = newText;
         }
-        // Chuyển input thành span
-        parent.replaceChild(spanText,input);
+
+        parent.replaceChild(spanText, input);
         rebuildArrays();
         updateDOM();
       }
-    
-      input.addEventListener('blur', finishEdit);
-      input.addEventListener('keydown', function(e) {
-        isKeyEsc = true;
-        if(e.key === 'Enter') {
 
+      input.addEventListener('blur', finishEdit);
+      input.addEventListener('keydown', function (e) {
+
+        isKeyEsc = true;
+
+        if (e.key === 'Enter') {
           isKeyEsc = false;
           input.blur();
-        } else if(e.key === "Escape") {
-
-        // Chuyển input thành span khi ấn EsC
-          parent.replaceChild(spanText,input);
+        } else if (e.key === "Escape") {
+          parent.replaceChild(spanText, input);
         }
-        
+
         isKeyEsc = false;
       })
     }
 
-    if(e.target.classList.contains('delete')) {
+    if (e.target.classList.contains('delete')) {
       const parent = e.target.closest('.drag-item');
       parent.remove();
       rebuildArrays();
@@ -304,6 +301,5 @@ listColumns.forEach(function(element, index ){
     }
   })
 })
-
 
 updateDOM()

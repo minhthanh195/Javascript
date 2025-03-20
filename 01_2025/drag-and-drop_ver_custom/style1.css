@@ -1,0 +1,189 @@
+@import url("https://fonts.googleapis.com/css?family=Quicksand&display=swap");
+
+:root {
+  --bg-image: url("https://picsum.photos/1500/1500");
+  --text-color: #fff;
+  --bg-overlay: rgba(0, 0, 0, 0.8);
+  --column-1: #a2622d;
+  --column-2: #1b6161;
+  --column-3: #248224;
+  --column-4: #a22d22;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Quicksand, sans-serif;
+  color: var(--text-color);
+  background: var(--bg-image) no-repeat center center fixed;
+  background-size: cover;
+  overflow-y: hidden;
+}
+
+textarea,input,button{
+  outline: none;
+}
+
+.main-title {
+  text-align: center;
+  font-size: 3rem;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 5px black;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.drag-container {
+  margin: 20px;
+}
+
+.drag-list {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.drag-text {
+  display: flex;
+}
+
+.drag-column {
+  flex: 0 0 calc(25% - 40px);
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 60vh;
+}
+
+.header {
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.drag-item-list {
+  max-height: 52vh;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.drag-item {
+  display: flex;
+  gap: 15px;
+  background-color: var(--bg-overlay);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.drag-item textarea {
+  width: 100%;
+  resize: none;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+.drag-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.drag-options {
+  display: flex;
+  gap: 5px;
+}
+
+.drag-btn {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: inherit;
+}
+
+.add-btn-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.add-btn, .add-btn.solid {
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+  user-select: none;
+}
+
+.add-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.add-btn:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #000;
+}
+
+.add-btn.solid {
+  display: none;
+  color: var(--text-color);
+}
+
+.add-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+  display: none;
+}
+
+.add-item {
+  width: 100%;
+  resize: none;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+.edit-input {
+  flex-grow: 1;
+}
+
+/* Column Colors */
+.backlog-column .header, .backlog-column .solid { background-color: var(--column-1); }
+.progress-column .header, .progress-column .solid { background-color: var(--column-2); }
+.complete-column .header, .complete-column .solid { background-color: var(--column-3); }
+.on-hold-column .header, .on-hold-column .solid { background-color: var(--column-4); }
+
+/* Custom Scrollbar */
+.drag-item-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.drag-item-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+
+.drag-item-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  body { overflow-y: auto; }
+  .drag-list { flex-direction: column; }
+  .drag-container { margin: 10px; }
+  .main-title { font-size: 2rem; }
+}

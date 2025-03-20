@@ -14,7 +14,7 @@
     <div class="drag-container">
         <ul class="drag-list">
             <!-- Backlog Column -->
-            <li class="drag-column backlog-column" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"
+            <li class="drag-column backlog-column" ondrop="drop(event)" ondragover="dragOver(event)"
                 ondragenter="dragEnter(0)">
                 <h2 class="header">Backlog</h2>
                 <!-- Backlog Content -->
@@ -24,7 +24,7 @@
                             <span class="drag-text">item 1</span>
                             <div class="drag-options">
                                 <button type="button" class="drag-btn edit">edit</button>
-                                <button type="button" class="drag-btn ">remove</button>
+                                <button type="button" class="drag-btn">remove</button>
                             </div>
                         </li>
                     </ul>
@@ -44,7 +44,7 @@
                 </div>
             </li>
             <!-- progress Column -->
-            <li class="drag-column progress-column" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"
+            <li class="drag-column progress-column" ondrop="drop(event)" ondragover="dragOver(event)"
                 ondragenter="dragEnter(1)">
                 <h2 class="header">progress</h2>
                 <!-- progress Content -->
@@ -67,7 +67,7 @@
                 </div>
             </li>
             <!-- complete Column -->
-            <li class="drag-column complete-column" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"
+            <li class="drag-column complete-column" ondrop="drop(event)" ondragover="dragOver(event)"
                 ondragenter="dragEnter(2)">
                 <h2 class="header">complete</h2>
                 <!-- complete Content -->
@@ -90,7 +90,7 @@
                 </div>
             </li>
             <!-- progress Column -->
-            <li class="drag-column on-hold-column" draggable="false" ondrop="drop(event)" ondragover="dragOver(event)"
+            <li class="drag-column on-hold-column" ondrop="drop(event)" ondragover="dragOver(event)"
                 ondragenter="dragEnter(3)">
                 <h2 class="header">on-hold</h2>
                 <!-- on-hold Content -->

@@ -124,11 +124,13 @@ ul {
 
 /* Drag and Drop */
 .over {
-  padding: 50px 10px;
+  /* padding: 50px 10px; */
+  margin-bottom: 20px;
 }
 
 .drag-item-list {
   min-height: 50px;
+  padding: 20px 0 ;
 }
 
 .drag-item {
