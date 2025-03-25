@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peaky Blinders</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <h1 class="main-title">Order by peaky blinders</h1>
+  <div class="drag-container">
+    <ul class="drag-list">
+      <li class="drag-column backlog-column" data-column="0">
+        <h2 class="header">Backlog</h2>
+        <div class="custom-scroll">
+          <ul class="drag-item-list"></ul>
+        </div>
+        <div class="add-btn-group">
+          <button class="add-btn" data-add="0"><i class="fa-solid fa-plus fa-xl"></i></button>
+          <button class="add-btn solid" data-save="0" style="display:none;"><i
+              class="fa-solid fa-check fa-xl"></i></button>
+        </div>
+        <div class="add-container" style="display:none;">
+          <textarea class="add-item"></textarea>
+        </div>
+      </li>
+
+      <li class="drag-column progress-column" data-column="1">
+        <h2 class="header">Progress</h2>
+        <div class="custom-scroll">
+          <ul class="drag-item-list"></ul>
+        </div>
+        <div class="add-btn-group">
+          <button class="add-btn" data-add="1"><i class="fa-solid fa-plus fa-xl"></i></button>
+          <button class="add-btn solid" data-save="1" style="display:none;"><i
+              class="fa-solid fa-check fa-xl"></i></button>
+        </div>
+        <div class="add-container" style="display:none;">
+          <textarea class="add-item"></textarea>
+        </div>
+      </li>
+
+      <li class="drag-column complete-column" data-column="2">
+        <h2 class="header">Complete</h2>
+        <div class="custom-scroll">
+          <ul class="drag-item-list"></ul>
+        </div>
+        <div class="add-btn-group">
+          <button class="add-btn" data-add="2"><i class="fa-solid fa-plus fa-xl"></i></button>
+          <button class="add-btn solid" data-save="2" style="display:none;"><i
+              class="fa-solid fa-check fa-xl"></i></button>
+        </div>
+        <div class="add-container" style="display:none;">
+          <textarea class="add-item"></textarea>
+        </div>
+      </li>
+
+      <li class="drag-column on-hold-column" data-column="3">
+        <h2 class="header">On Hold</h2>
+        <div class="custom-scroll">
+          <ul class="drag-item-list"></ul>
+        </div>
+        <div class="add-btn-group">
+          <button class="add-btn" data-add="3"><i class="fa-solid fa-plus fa-xl"></i></button>
+          <button class="add-btn solid" data-save="3" style="display:none;"><i
+              class="fa-solid fa-check fa-xl"></i></button>
+        </div>
+        <div class="add-container" style="display:none;">
+          <textarea class="add-item"></textarea>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Popup -->
+  <div class="popup">
+    <div class="popup-box">
+      <ul class="drag-select-list">
+        <li class="drag-select-item is-active">
+          <button type="button" class="drag-select-btn backlog" data-move="0">backlog</button>
+        </li>
+        <li class="drag-select-item">
+          <button type="button" class="drag-select-btn progress" data-move="1">progress</button>
+        </li>
+        <li class="drag-select-item">
+          <button type="button" class="drag-select-btn complete" data-move="2">complete</button>
+        </li>
+        <li class="drag-select-item">
+          <button type="button" class="drag-select-btn onhold" data-move="3">onhold</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+
+</html>

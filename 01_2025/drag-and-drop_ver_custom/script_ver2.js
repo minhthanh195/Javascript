@@ -117,7 +117,7 @@ function handleDragEvents(e) {
         save.classList.add('drag-btn', 'save');
 
         dragOption.replaceChild(save, edit);
-        
+
         textarea.type = 'text';
         textarea.value = span.textContent;
         item.replaceChild(textarea, span);
@@ -135,7 +135,7 @@ function handleDragEvents(e) {
         textarea.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') {
             item.replaceChild(span, textarea)
-           dragOption.replaceChild(edit, save);
+            dragOption.replaceChild(edit, save);
           };
         });
         save.addEventListener('click', finishEdit);

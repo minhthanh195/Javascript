@@ -10,7 +10,8 @@
   --column-4: #a22d22;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -21,7 +22,9 @@ html, body {
   overflow-y: hidden;
 }
 
-textarea,input,button{
+textarea,
+input,
+button {
   outline: none;
 }
 
@@ -117,7 +120,8 @@ ul {
   margin-top: 10px;
 }
 
-.add-btn, .add-btn.solid {
+.add-btn,
+.add-btn.solid {
   cursor: pointer;
   padding: 6px 12px;
   border-radius: 5px;
@@ -160,10 +164,25 @@ ul {
 }
 
 /* Column Colors */
-.backlog-column .header, .backlog-column .solid { background-color: var(--column-1); }
-.progress-column .header, .progress-column .solid { background-color: var(--column-2); }
-.complete-column .header, .complete-column .solid { background-color: var(--column-3); }
-.on-hold-column .header, .on-hold-column .solid { background-color: var(--column-4); }
+.backlog-column .header,
+.backlog-column .solid {
+  background-color: var(--column-1);
+}
+
+.progress-column .header,
+.progress-column .solid {
+  background-color: var(--column-2);
+}
+
+.complete-column .header,
+.complete-column .solid {
+  background-color: var(--column-3);
+}
+
+.on-hold-column .header,
+.on-hold-column .solid {
+  background-color: var(--column-4);
+}
 
 /* Custom Scrollbar */
 .drag-item-list::-webkit-scrollbar {
@@ -182,8 +201,19 @@ ul {
 
 /* Responsive Design */
 @media (max-width: 600px) {
-  body { overflow-y: auto; }
-  .drag-list { flex-direction: column; }
-  .drag-container { margin: 10px; }
-  .main-title { font-size: 2rem; }
+  body {
+    overflow-y: auto;
+  }
+
+  .drag-list {
+    flex-direction: column;
+  }
+
+  .drag-container {
+    margin: 10px;
+  }
+
+  .main-title {
+    font-size: 2rem;
+  }
 }
