@@ -1,7 +1,9 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState} from "react";
 import { Todo } from "../types/todo";
+import TodoItem from "../components/TodoItem";
+import Clock from "@/components/test";
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([
@@ -10,6 +12,8 @@ export default function Home() {
     {id : 3, text: 'Create todo app', completed: false}
   ]);
   const [newTodo, setNewTodo] = useState<string>('');
+
+  const [show, setShow] = useState<boolean>(true);
 
   const handleChangeInput = (e : ChangeEvent<HTMLInputElement>) => {
     setNewTodo(e.target.value);
@@ -52,29 +56,12 @@ export default function Home() {
 
       <ul>
         {todos.map((todo) => (
-          <li 
-            key= {todo.id}
-            style={{
-              marginBottom: '10px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: "center",
-              justifyContent: 'space-between',
-              width: '300px',
-            }}
-          >
-            <span 
-              onClick={() => toggleCompleted(todo.id)}
-              style={{
-                textDecoration: todo.completed ? 'line-through' : 'none',
-              }}
-            >
-              {todo.text}
-            </span>
-            <button onClick={() => deleteTodo(todo.id)} style = {{marginLeft: '10px'}}>
-              X
-            </button>
-          </li>
+          <TodoItem
+            key={todo.id}
+            todo = {todo}
+            onToggle={toggleCompleted}
+            onDelete={deleteTodo}
+          />
         ))}
       </ul>
 
@@ -90,6 +77,12 @@ export default function Home() {
           Add
         </button>
       </form>
+
+      <div>
+        <button onClick={() => setShow(!show)}>Toggle</button>
+        {show && <Clock />}
+      </div>
+
     </>
   );
 }
