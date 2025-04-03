@@ -1,36 +1,63 @@
 'use client';
 
+import { useState } from "react";
 import { Todo } from "../types/todo";
 
 interface TodoItemProps {
     todo: Todo;
     onToggle: (id : number) => void;
     onDelete: (id : number) => void;
+    onEdit: (id: number, newtext: string) => void;
 }
 
-export default function TodoItem({todo, onToggle, onDelete} : TodoItemProps) {
+export default function TodoItem({todo, onToggle, onDelete, onEdit} : TodoItemProps) {
+    const [isEditing,setIsEditing] = useState<boolean>(false)
+    const [editedText ,setEditedText ] = useState<string>(todo.text)
+
+    const handleEditSubmit = () => {
+      if(editedText.trim() !== '') {
+        onEdit(todo.id, editedText.trim());
+      }
+      setIsEditing(false);
+    }
     return (
-        <li
-            style={{
-            marginBottom: '10px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: '300px',
-          }}
+        <li 
+          className="flex justify-between items-center px-4 py-2 border rounded 
+          bg-gray-50 dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600
+          group transition"
+          onDoubleClick={() => setIsEditing(true)}
         >
-            <span 
+          {isEditing ? (
+            <input
+            type="text"
+            value={editedText}
+            onChange={(e) => setEditedText(e.target.value)}
+            onBlur={handleEditSubmit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleEditSubmit();
+              if (e.key === 'Escape') setIsEditing(false);
+            }}
+            autoFocus
+            className="flex-1 border px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+          ) : (
+            <span
                 onClick={() => onToggle(todo.id)}
-                style={{textDecoration: todo.completed ? 'line-through' : 'none',}}
-            >{todo.text}
+                className={`cursor-pointer flex-1 ${
+                  todo.completed ? 'line-through text-gray-400' : 'text-gray-800 dark:text-neutral-50'
+                } group-hover:text-blue-700 transition`}
+              >
+              {todo.text}
             </span>
-            <button 
-                onClick={()=> onDelete(todo.id)} 
-                style={{ marginLeft: '10px' }}
-            >
-                X
-            </button>
+          )
+          }
+        
+        <button
+          onClick={() => onDelete(todo.id)}
+          className="text-red-400 hover:text-red-600 transition ml-4 cursor-pointer"
+        >
+          ❌
+        </button>
         </li>
     )
 }
