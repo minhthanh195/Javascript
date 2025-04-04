@@ -1,5 +1,6 @@
 'use client';
 
+import dayjs from '../lib/dayjs';
 import { useState } from "react";
 import { Todo } from "../types/todo";
 
@@ -41,14 +42,19 @@ export default function TodoItem({todo, onToggle, onDelete, onEdit} : TodoItemPr
             className="flex-1 border px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
           ) : (
-            <span
+            <>
+              <span
                 onClick={() => onToggle(todo.id)}
                 className={`cursor-pointer flex-1 ${
                   todo.completed ? 'line-through text-gray-400' : 'text-gray-800 dark:text-neutral-50'
                 } group-hover:text-blue-700 transition`}
               >
-              {todo.text}
-            </span>
+                {todo.text}
+              </span>
+              <p className="text-xs text-gray-400 mt-1">
+                🕒 {dayjs(todo.createdAt).fromNow()}
+              </p>
+            </>
           )
           }
         
