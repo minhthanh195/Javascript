@@ -2,8 +2,12 @@
 
 import dayjs from "../lib/dayjs";
 import { useState } from "react";
+import { TrashIcon, CalendarIcon } from '@heroicons/react/24/solid';
+import { ClockIcon } from '@heroicons/react/24/outline';
 import { Todo } from "../types/todo";
 import { getTagColor } from "../utils/getTagColor";
+import CountdownTimer from "./CoundownTimer";
+
 interface TodoItemProps {
   todo: Todo;
   onToggle: (id: number) => void;
@@ -45,7 +49,7 @@ export default function TodoItem({
               if (e.key === "Escape") setIsEditing(false);
             }}
             autoFocus
-            className="flex-1 border px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="flex-1 border px-2 py-1 rounded focus:outline-none"
           />
         ) : (
           <>
@@ -55,12 +59,13 @@ export default function TodoItem({
                 todo.completed
                   ? "line-through text-gray-400"
                   : "text-gray-800 dark:text-neutral-50"
-              } group-hover:text-blue-700 transition`}
+              } group-hover:text-red-400 transition`}
             >
               {todo.text}
             </span>
-            <p className="text-xs text-gray-400 mt-1">
-              🕒 {dayjs(todo.createdAt).fromNow()}
+            <p className="flex items-center text-xs text-gray-400">
+            <ClockIcon className="w-4 h-4 mr-1 mt-4px text-gray-500 dark:text-gray-300 pointer-events-none" />
+              {dayjs(todo.createdAt).fromNow()}
             </p>
           </>
         )}
@@ -68,7 +73,7 @@ export default function TodoItem({
           onClick={() => onDelete(todo.id)}
           className="text-red-400 hover:text-red-600 transition ml-4 cursor-pointer"
         >
-          ❌
+          <TrashIcon className="w-4 h-4 text-gray-500 dark:text-gray-300 pointer-events-none" />
         </button>
       </div>
       {todo.tags && todo.tags.length > 0 && (
@@ -84,6 +89,9 @@ export default function TodoItem({
             </span>
           ))}
         </div>
+      )}
+      {todo.deadline && (
+        <CountdownTimer deadline={todo.deadline} />
       )}
     </li>
   );

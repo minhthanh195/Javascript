@@ -4,4 +4,6 @@ export interface Todo {
     completed: boolean;
     createdAt: string;
     tags?: string[];
+    deadline?: string;
+    completedAt?: string;
 }

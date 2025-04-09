@@ -1,0 +1,21 @@
+### GET todos
+GET http://localhost:3000/api/todos
+
+### POST todo mới
+POST http://localhost:3000/api/todos
+Content-Type: application/json
+
+{
+  "id": 123456,
+  "text": "Thử thêm việc từ REST client",
+  "completed": false,
+  "createdAt": "2025-04-06T12:00:00Z"
+}
+
+### DELETE todo
+DELETE http://localhost:3000/api/todos
+Content-Type: application/json
+
+{
+  "id": 123456
+}
