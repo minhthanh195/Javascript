@@ -1,34 +1,30 @@
-"use client";
+'use client';
 
-import { ChangeEvent, FormEvent, useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect, ChangeEvent, FormEvent } from 'react';
 import {
-  CalendarIcon,
-  FolderIcon,
-  WrenchIcon,
-  XCircleIcon,
-  ChevronDownIcon,
-} from "@heroicons/react/24/outline";
+  CalendarIcon, FolderIcon, WrenchIcon, XCircleIcon, ChevronDownIcon
+} from '@heroicons/react/24/outline';
 import {
-  MoonIcon,
-  SunIcon,
-  ClipboardDocumentListIcon,
-} from "@heroicons/react/24/solid";
-import useDarkMode from "../hooks/useDarkMode";
-import { useDebounced } from "../hooks/useDebouncedValue";
-import { Todo } from "../types/todo";
-import TodoItem from "../components/TodoItem";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import ConfirmDialog from "@/components/ConfirmDialog";
-import { filterRecentCompleted } from "../utils/filterRecentCompleted";
+  MoonIcon, SunIcon, ClipboardDocumentListIcon
+} from '@heroicons/react/24/solid';
+import { Todo } from '@/types/todo';
+import { useDebounced } from '../hooks/useDebouncedValue';
+import useDarkMode from '../hooks/useDarkMode';
+import { useTodoManager } from '../hooks/useTodoManager';
+import TodoItem from '../components/TodoItem';
+import ConfirmDialog from '@/components/ConfirmDialog';
+import { filterRecentCompleted } from '../utils/filterRecentCompleted';
+
 export default function Home() {
-  type FilterType = "all" | "doing" | "completed";
+  const [currentGroup, setCurrentGroup] = useState('Personal');
+  const [newTodo, setNewTodo] = useState('');
+  const [newTags, setNewTags] = useState('');
+  const [newDeadline, setNewDeadline] = useState('');
+  const [filter, setFilter] = useState<'all' | 'doing' | 'completed'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [todoToDelete, setTodoToDelete] = useState<Todo | null>(null);
 
-  const [newTodo, setNewTodo] = useState<string>("");
-  const [todos, setTodos] = useLocalStorage<Todo[]>("todos", []);
-  const [filter, setFilter] = useState<FilterType>("all");
-  const [deletedTodos, setDeletedTodos] = useState<Todo[]>([]);
-  const undoTimers = useRef<Record<number, NodeJS.Timeout>>({});
-  const [currentGroup, setCurrentGroup] = useState("Personal");
   const groupList = [
     {
       key: "Personal",
@@ -47,369 +43,272 @@ export default function Home() {
       text: "Khác",
     },
   ];
-  const [newTags, setNewTags] = useState("");
-  const { isDark, toggleDark, isReady } = useDarkMode();
-  const [todoToDelete, setTodoToDelete] = useState<Todo | null>(null);
-  const [newDeadline, setNewDeadline] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true); 
-  // Hai cái này dựa vào để hiển thị layout cho phù hợp tình huống hiện tại chưa áp dụng 
-  const [error, setError] = useState(false);
-
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewTodo(e.target.value);
   };
+  
+  const {
+    todos,
+    deletedTodos,
+    loading,
+    error,
+    addTodo,
+    toggleCompleted,
+    deleteTodo,
+    editTodo,
+    clearCompleted,
+    undoLastDelete,
+  } = useTodoManager(currentGroup);
+
+  const { isDark, toggleDark, isReady } = useDarkMode();
+  const debouncedSearchTerm = useDebounced(searchTerm, 500);
+
   const handleAddTodo = async (e: FormEvent) => {
     e.preventDefault();
+    if (newTodo.trim() === '') return;
 
-    if (newTodo.trim() === "") return;
-
-    const tags = newTags
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-
+    const tags = newTags.split(',').map(t => t.trim()).filter(Boolean);
     const newItem: Todo = {
       id: Date.now(),
       text: newTodo,
       completed: false,
       createdAt: new Date().toISOString(),
-      tags: tags,
+      tags,
       deadline: newDeadline || undefined,
       completedAt: undefined,
     };
-
-    await fetch('/api/todos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newItem),
-    });
-
-    setTodos([newItem, ...todos]);
-    setNewTodo("");
-    setNewTags("");
-    setNewDeadline("");
-  };
-  const toggleCompleted = (id: number) => {
-    const updateTodo = todos.map((todo) =>
-      todo.id === id
-        ? {
-            ...todo,
-            completed: !todo.completed,
-            completedAt: !todo.completedAt
-              ? new Date().toISOString()
-              : undefined,
-          }
-        : todo
-    );
-
-    setTodos(updateTodo);
-  };
-  const deleteTodo = async (id: number) => {
-    const deleted = todos.find((todo) => todo.id === id);
-    if (!deleted) return;
-
-    await fetch('/api/todos', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-
-    setDeletedTodos((prev) => [deleted, ...prev]);
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-
-    const timeout = setTimeout(() => {
-      setDeletedTodos((prev) => prev.filter((todo) => todo.id !== id));
-      delete undoTimers.current[id]; // xoá luôn timeout đã hết
-    }, 10000);
-
-    undoTimers.current[id] = timeout;
-  };
-  const editTodo = (id: number, newText: string) => {
-    setTodos((prev) =>
-      prev.map((todo) => (todo.id === id ? { ...todo, text: newText } : todo))
-    );
-  };
-  const clearCompleted = () => {
-    setTodos((prev) => prev.filter((todo) => !todo.completed));
-  };
-  const undoLastDelete = () => {
-    const [last, ...rest] = deletedTodos;
-    if (!last) return;
-    if (undoTimers.current[last.id]) {
-      clearTimeout(undoTimers.current[last.id]);
-      delete undoTimers.current[last.id];
-    }
-    setTodos((prev) => [...prev, last]);
-    setDeletedTodos(rest);
+    await addTodo(newItem);
+    setNewTodo('');
+    setNewTags('');
+    setNewDeadline('');
   };
 
-  const visibleTodo = filterRecentCompleted(todos);
-  const filteredTodos = visibleTodo.filter((todo) =>
-    todo.text.toLowerCase().includes(searchTerm.toLowerCase())
+  const visibleTodos = filterRecentCompleted(todos);
+  const filteredTodos = visibleTodos.filter(todo =>
+    todo.text?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const debouncedSearchTearm = useDebounced<string>(searchTerm, 500);
 
   useEffect(() => {
-    fetch('/api/todos')
-      .then((res) => res.json())
-      .then(data => {
-        console.log('Dữ liệu từ API:', data);
-        setTodos(data);
-      })
-      .catch(err => {
-        console.error('Lỗi gọi API:', err);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    const fetchTodos = async () => {
-      const res = await fetch('/api/todos');
-      const data = await res.json();
-      setTodos(data);
-    };
-    fetchTodos();
-  },[]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(`todos_${currentGroup}`);
-    if (saved) {
-      setTodos(JSON.parse(saved));
-    } else {
-      setTodos([]);
-    }
-  }, [currentGroup]);
-
-  useEffect(() => {
-    localStorage.setItem(`todos_${currentGroup}`, JSON.stringify(todos));
-  }, [todos, currentGroup]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("recent-searches");
+    const saved = localStorage.getItem('recent-searches');
     if (saved) setRecentSearches(JSON.parse(saved));
   }, []);
 
   useEffect(() => {
-    if (!debouncedSearchTearm.trim()) return;
-
-    const keyword = debouncedSearchTearm.trim();
-    setRecentSearches((prev) => {
-      const newList = [keyword, ...prev.filter((k) => k !== keyword)].slice(
-        0,
-        7
-      );
-      localStorage.setItem("recent-searches", JSON.stringify(newList));
+    if (!debouncedSearchTerm.trim()) return;
+    const keyword = debouncedSearchTerm.trim();
+    setRecentSearches(prev => {
+      const newList = [keyword, ...prev.filter(k => k !== keyword)].slice(0, 7);
+      localStorage.setItem('recent-searches', JSON.stringify(newList));
       return newList;
     });
-  }, [debouncedSearchTearm]);
+  }, [debouncedSearchTerm]);
 
   if (!isReady) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900 transition">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900 transition">
+      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    </div>
   }
+
+  // ... phần JSX giữ nguyên, chỉ đổi các handler thành hàm từ hook như:
+  // onToggle={toggleCompleted}, onEdit={editTodo}, onDelete={() => setTodoToDelete(todo)}
 
   return (
     <>
-      <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="w-full max-w-xl bg-white dark:bg-gray-800 shadow rounded-xl p-6">
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={toggleDark}
-              className="flex gap-[3px] text-sm text-stone-950 dark:text-stone-50 hover:underline cursor-pointer"
+    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-xl bg-white dark:bg-gray-800 shadow rounded-xl p-6">
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={toggleDark}
+            className="flex gap-[3px] text-sm text-stone-950 dark:text-stone-50 hover:underline cursor-pointer"
+          >
+            Chế độ :{" "}
+            {isDark ? (
+              <>
+                Tối
+                <MoonIcon className="w-5 h-5 text-amber-300  pointer-events-none" />
+              </>
+            ) : (
+              <>
+                Sáng
+                <SunIcon className="w-5 h-5 text-amber-300 dark:text-gray-300 pointer-events-none" />
+              </>
+            )}
+          </button>
+        </div>
+        <div className="mb-6 flex items-center gap-4">
+          <label className="flex gap-[3px] text-sm font-medium text-gray-700 dark:text-gray-300">
+            <FolderIcon className="w-5 h-5 text-gray-500 dark:text-gray-300 pointer-events-none" />
+            Danh sách:
+          </label>
+
+          <div className="relative">
+            <select
+              value={currentGroup}
+              onChange={(e) => setCurrentGroup(e.target.value)}
+              className="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 
+               text-sm rounded px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-400 
+               text-gray-800 dark:text-gray-100 shadow-sm transition"
             >
-              Chế độ :{" "}
-              {isDark ? (
-                <>
-                  Tối
-                  <MoonIcon className="w-5 h-5 text-amber-300  pointer-events-none" />
-                </>
-              ) : (
-                <>
-                  Sáng
-                  <SunIcon className="w-5 h-5 text-amber-300 dark:text-gray-300 pointer-events-none" />
-                </>
-              )}
-            </button>
-          </div>
-          <div className="mb-6 flex items-center gap-4">
-            <label className="flex gap-[3px] text-sm font-medium text-gray-700 dark:text-gray-300">
-              <FolderIcon className="w-5 h-5 text-gray-500 dark:text-gray-300 pointer-events-none" />
-              Danh sách:
-            </label>
+              {groupList.map((g, index) => (
+                <option key={index} value={g.key}>
+                  {g.text}
+                </option>
+              ))}
+            </select>
 
-            <div className="relative">
-              <select
-                value={currentGroup}
-                onChange={(e) => setCurrentGroup(e.target.value)}
-                className="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 
-                 text-sm rounded px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-400 
-                 text-gray-800 dark:text-gray-100 shadow-sm transition"
-              >
-                {groupList.map((g, index) => (
-                  <option key={index} value={g.key}>
-                    {g.text}
-                  </option>
-                ))}
-              </select>
-
-              {/* ▼ icon */}
-              <div className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                <ChevronDownIcon className="w-5 h-5 text-gray-500 dark:text-gray-300 pointer-events-none" />
-              </div>
+            {/* ▼ icon */}
+            <div className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+              <ChevronDownIcon className="w-5 h-5 text-gray-500 dark:text-gray-300 pointer-events-none" />
             </div>
           </div>
+        </div>
 
-          <h1 className="flex gap-[6px] justify-center items-center text-3xl font-bold text-neutral-600 dark:text-stone-50 text-center mb-6">
-            <ClipboardDocumentListIcon className="w-8 h-8 text-blue-600 dark:text-gray-300 pointer-events-none" />
-            Danh sách việc cần làm
-          </h1>
+        <h1 className="flex gap-[6px] justify-center items-center text-3xl font-bold text-neutral-600 dark:text-stone-50 text-center mb-6">
+          <ClipboardDocumentListIcon className="w-8 h-8 text-blue-600 dark:text-gray-300 pointer-events-none" />
+          Danh sách việc cần làm
+        </h1>
 
-          <form onSubmit={handleAddTodo} className="flex gap-2 mb-6 flex-col">
-            <input
-              type="text"
-              value={newTodo}
-              onChange={handleInputChange}
-              placeholder="Nhập việc cần làm..."
-              className="flex-1 border border-gray-300 px-4 py-2 rounded text-sm focus:outline-none text-zinc-700 dark:text-neutral-50"
-            />
-            <input
-              type="text"
-              value={newTags}
-              onChange={(e) => setNewTags(e.target.value)}
-              placeholder="Thêm tags: urgent, study, bug, personal, work, .etc"
-              className="w-full mt-2 border border-gray-300 px-4 py-2 rounded text-sm focus:outline-none text-zinc-700 dark:text-neutral-50"
-            />
-            <div className="relative w-full mt-2">
-              <input
-                type="datetime-local"
-                value={newDeadline}
-                onChange={(e) => setNewDeadline(e.target.value)}
-                className="pl-10 pr-3 py-2 w-full rounded border border-gray-300 dark:border-gray-300 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-              <CalendarIcon className="w-5 h-5 text-gray-500 dark:text-gray-300 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition cursor-pointer"
-            >
-              Thêm
-            </button>
-          </form>
-          <div className="flex gap-2 mb-4 justify-center">
-            <button
-              onClick={() => setFilter("all")}
-              className={`text-sm px-2 py-1 rounded ${
-                filter === "all"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 cursor-pointer"
-              }`}
-            >
-              Tất cả
-            </button>
-            <button
-              onClick={() => setFilter("doing")}
-              className={`text-sm px-2 py-1 rounded ${
-                filter === "doing"
-                  ? "bg-emerald-400 text-white"
-                  : "bg-gray-200 text-gray-700 cursor-pointer"
-              }`}
-            >
-              Đang thực hiện
-            </button>
-            <button
-              onClick={() => setFilter("completed")}
-              className={`text-sm px-2 py-1 rounded ${
-                filter === "completed"
-                  ? "bg-rose-600 text-white"
-                  : "bg-gray-200 text-gray-700 cursor-pointer"
-              }`}
-            >
-              Đã hoàn thành
-            </button>
-          </div>
+        <form onSubmit={handleAddTodo} className="flex gap-2 mb-6 flex-col">
           <input
             type="text"
-            placeholder="Tìm công việc..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full border border-gray-300 px-4 py-2 rounded mt-1 focus:outline-none dark:bg-gray-800 text-gray-800 dark:text-white"
+            value={newTodo}
+            onChange={handleInputChange}
+            placeholder="Nhập việc cần làm..."
+            className="flex-1 border border-gray-300 px-4 py-2 rounded text-sm focus:outline-none text-zinc-700 dark:text-neutral-50"
           />
-          {recentSearches.length > 0 && (
-            <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Từ khoá gần đây:
-              <div className="flex flex-wrap gap-2 mt-1">
-                {recentSearches.map((kw, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSearchTerm(kw)}
-                    className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm cursor-pointer"
-                  >
-                    {kw}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          <ul className="space-y-2 mt-5">
-            {filteredTodos
-              .filter((todo) => {
-                if (filter === "doing") return !todo.completed;
-                if (filter === "completed") return todo.completed;
-                return true;
-              })
-              .map((todo) => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  onToggle={toggleCompleted}
-                  onEdit={editTodo}
-                  onDelete={(id) => {
-                    const found = todos.find((t) => t.id === id);
-                    if (found) setTodoToDelete(found);
-                  }}
-                />
-              ))}
-          </ul>
-          {todos.some((todo) => todo.completed) && (
-            <div className="flex justify-center mt-4 text-center">
-              <button
-                onClick={clearCompleted}
-                className="flex gap-[3px] items-center text-sm text-stone-950 dark:text-stone-50 hover:underline hover:text-red-600 transition cursor-pointer"
-              >
-                <XCircleIcon className="w-5 h-5 text-red-500 dark:text-amber-300 pointer-events-none" />
-                Xoá tất cả công việc đã hoàn thành
-              </button>
-            </div>
-          )}
-          {deletedTodos.length > 0 && (
-            <div className="flex justify-center mt-4 text-center">
-              <button
-                onClick={undoLastDelete}
-                className="flex gap-[3px] items-center text-sm text-blue-500 dark:text-stone-50 hover:text-blue-700 hover:underline transition cursor-pointer"
-              >
-                <WrenchIcon className="w-5 h-5 text-blue-600 dark:text-amber-300 pointer-events-none" />
-                Hoàn tác
-              </button>
-            </div>
-          )}
+          <input
+            type="text"
+            value={newTags}
+            onChange={(e) => setNewTags(e.target.value)}
+            placeholder="Thêm tags: urgent, study, bug, personal, work, .etc"
+            className="w-full mt-2 border border-gray-300 px-4 py-2 rounded text-sm focus:outline-none text-zinc-700 dark:text-neutral-50"
+          />
+          <div className="relative w-full mt-2">
+            <input
+              type="datetime-local"
+              value={newDeadline}
+              onChange={(e) => setNewDeadline(e.target.value)}
+              className="pl-10 pr-3 py-2 w-full rounded border border-gray-300 dark:border-gray-300 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <CalendarIcon className="w-5 h-5 text-gray-500 dark:text-gray-300 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition cursor-pointer"
+          >
+            Thêm
+          </button>
+        </form>
+        <div className="flex gap-2 mb-4 justify-center">
+          <button
+            onClick={() => setFilter("all")}
+            className={`text-sm px-2 py-1 rounded ${
+              filter === "all"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 cursor-pointer"
+            }`}
+          >
+            Tất cả
+          </button>
+          <button
+            onClick={() => setFilter("doing")}
+            className={`text-sm px-2 py-1 rounded ${
+              filter === "doing"
+                ? "bg-emerald-400 text-white"
+                : "bg-gray-200 text-gray-700 cursor-pointer"
+            }`}
+          >
+            Đang thực hiện
+          </button>
+          <button
+            onClick={() => setFilter("completed")}
+            className={`text-sm px-2 py-1 rounded ${
+              filter === "completed"
+                ? "bg-rose-600 text-white"
+                : "bg-gray-200 text-gray-700 cursor-pointer"
+            }`}
+          >
+            Đã hoàn thành
+          </button>
         </div>
-        {todoToDelete && (
-          <ConfirmDialog
-            message={`Bạn có chắc muốn xoá "${todoToDelete.text}"?`}
-            onConfirm={() => {
-              deleteTodo(todoToDelete.id);
-              setTodoToDelete(null);
-            }}
-            onCancel={() => setTodoToDelete(null)}
-          />
+        <input
+          type="text"
+          placeholder="Tìm công việc..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full border border-gray-300 px-4 py-2 rounded mt-1 focus:outline-none dark:bg-gray-800 text-gray-800 dark:text-white"
+        />
+        {recentSearches.length > 0 && (
+          <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Từ khoá gần đây:
+            <div className="flex flex-wrap gap-2 mt-1">
+              {recentSearches.map((kw, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSearchTerm(kw)}
+                  className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm cursor-pointer"
+                >
+                  {kw}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
-      </main>
-    </>
+        <ul className="space-y-2 mt-5">
+          {filteredTodos
+            .filter((todo) => {
+              if (filter === "doing") return !todo.completed;
+              if (filter === "completed") return todo.completed;
+              return true;
+            })
+            .map((todo) => (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                onToggle={toggleCompleted}
+                onEdit={editTodo}
+                onDelete={(id) => {
+                  const found = todos.find((t) => t.id === id);
+                  if (found) setTodoToDelete(found);
+                }}
+              />
+            ))}
+        </ul>
+        {todos.some((todo) => todo.completed) && (
+          <div className="flex justify-center mt-4 text-center">
+            <button
+              onClick={clearCompleted}
+              className="flex gap-[3px] items-center text-sm text-stone-950 dark:text-stone-50 hover:underline hover:text-red-600 transition cursor-pointer"
+            >
+              <XCircleIcon className="w-5 h-5 text-red-500 dark:text-amber-300 pointer-events-none" />
+              Xoá tất cả công việc đã hoàn thành
+            </button>
+          </div>
+        )}
+        {deletedTodos.length > 0 && (
+          <div className="flex justify-center mt-4 text-center">
+            <button
+              onClick={undoLastDelete}
+              className="flex gap-[3px] items-center text-sm text-blue-500 dark:text-stone-50 hover:text-blue-700 hover:underline transition cursor-pointer"
+            >
+              <WrenchIcon className="w-5 h-5 text-blue-600 dark:text-amber-300 pointer-events-none" />
+              Hoàn tác
+            </button>
+          </div>
+        )}
+      </div>
+      {todoToDelete && (
+        <ConfirmDialog
+          message={`Bạn có chắc muốn xoá "${todoToDelete.text}"?`}
+          onConfirm={() => {
+            deleteTodo(todoToDelete.id);
+            setTodoToDelete(null);
+          }}
+          onCancel={() => setTodoToDelete(null)}
+        />
+      )}
+    </main>
+  </>
   );
 }

@@ -2,8 +2,13 @@
 
 import dayjs from "../lib/dayjs";
 import { useState } from "react";
-import { TrashIcon, CalendarIcon } from '@heroicons/react/24/solid';
-import { ClockIcon } from '@heroicons/react/24/outline';
+import {
+  TrashIcon,
+  CalendarIcon,
+  PencilIcon,
+  CheckCircleIcon,
+} from "@heroicons/react/24/solid";
+import { ClockIcon } from "@heroicons/react/24/outline";
 import { Todo } from "../types/todo";
 import { getTagColor } from "../utils/getTagColor";
 import CountdownTimer from "./CoundownTimer";
@@ -28,14 +33,12 @@ export default function TodoItem({
     if (editedText.trim() !== "") {
       onEdit(todo.id, editedText.trim());
     }
-    setIsEditing(false);
   };
   return (
     <li
       className="flex flex-col justify-between px-4 py-2 border rounded 
           bg-gray-50 dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600
           group transition"
-      onDoubleClick={() => setIsEditing(true)}
     >
       <div className="flex justify-between flex-1">
         {isEditing ? (
@@ -64,11 +67,33 @@ export default function TodoItem({
               {todo.text}
             </span>
             <p className="flex items-center text-xs text-gray-400">
-            <ClockIcon className="w-4 h-4 mr-1 mt-4px text-gray-500 dark:text-gray-300 pointer-events-none" />
+              <ClockIcon className="w-4 h-4 mr-1 mt-4px text-gray-500 dark:text-gray-300 pointer-events-none" />
               {dayjs(todo.createdAt).fromNow()}
             </p>
           </>
         )}
+
+        { isEditing ? 
+          (<button
+            onClick={() => {
+              setIsEditing(false)
+              handleEditSubmit()
+            }}
+            className="text-red-400 hover:text-red-600 transition ml-4 cursor-pointer"
+          >
+            <CheckCircleIcon className="w-4 h-4 text-gray-500 dark:text-gray-300 pointer-events-none" />
+          </button>) :
+          (
+            <button
+            onClick={() => setIsEditing(true)}
+            className="text-red-400 hover:text-red-600 transition ml-4 cursor-pointer a"
+            >
+              <PencilIcon className="w-4 h-4 text-gray-500 dark:text-gray-300 pointer-events-none" />
+            </button>
+          )
+
+        }
+
         <button
           onClick={() => onDelete(todo.id)}
           className="text-red-400 hover:text-red-600 transition ml-4 cursor-pointer"
@@ -90,9 +115,7 @@ export default function TodoItem({
           ))}
         </div>
       )}
-      {todo.deadline && (
-        <CountdownTimer deadline={todo.deadline} />
-      )}
+      {todo.deadline && <CountdownTimer deadline={todo.deadline} />}
     </li>
   );
 }
