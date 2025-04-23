@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Todo } from "@/types/todo";
 import { supabase } from "@/lib/supabase";
+import { useLocalStorage } from "./useLocalStorage";
 
 export function useTodoManager(currentGroup: string) {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -9,6 +10,7 @@ export function useTodoManager(currentGroup: string) {
   const [error, setError] = useState(false);
   const [deletedTodos, setDeletedTodos] = useState<Todo[]>([]);
   const undoTimers = useRef<Record<number, NodeJS.Timeout>>({});
+  const [dataGroup, setDataGroup] = useLocalStorage('group', currentGroup)
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -27,7 +29,7 @@ export function useTodoManager(currentGroup: string) {
       }
       setLoading(false);
     };
-
+    setDataGroup(currentGroup)
     fetchTodos();
   }, [currentGroup]);
 
@@ -134,5 +136,6 @@ export function useTodoManager(currentGroup: string) {
     clearCompleted,
     undoLastDelete,
     setTodos,
+    dataGroup
   };
 }

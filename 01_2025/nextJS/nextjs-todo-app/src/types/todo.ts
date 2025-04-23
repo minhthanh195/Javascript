@@ -6,4 +6,5 @@ export interface Todo {
   tags?: string[];
   deadline?: string;
   completedAt?: string;
+  group: string;
 }

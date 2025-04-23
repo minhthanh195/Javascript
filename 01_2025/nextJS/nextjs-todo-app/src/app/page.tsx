@@ -42,6 +42,7 @@ export default function Home() {
     editTodo,
     clearCompleted,
     undoLastDelete,
+    dataGroup
   } = useTodoManager(currentGroup);
 
   const { isDark, toggleDark, isReady } = useDarkMode();
@@ -86,6 +87,7 @@ export default function Home() {
       tags,
       deadline: newDeadline || undefined,
       completedAt: undefined,
+      group: currentGroup,
     };
     await addTodo(newItem);
     setNewTodo("");
@@ -101,6 +103,7 @@ export default function Home() {
   useEffect(() => {
     const saved = localStorage.getItem("recent-searches");
     if (saved) setRecentSearches(JSON.parse(saved));
+    if(dataGroup) setCurrentGroup(dataGroup);
   }, []);
 
   useEffect(() => {
