@@ -1,10 +1,10 @@
 import dayjs from "dayjs";
 
-export function getCountdown(deadline : string): string {
+export function getCountdown(deadline: string): string {
   const now = dayjs();
   const end = dayjs(deadline);
 
-  if (end.isBefore(now)) return 'Đã quá hạn';
+  if (end.isBefore(now)) return "Đã quá hạn";
 
   const diffMs = end.diff(now);
   const dur = dayjs.duration(diffMs);

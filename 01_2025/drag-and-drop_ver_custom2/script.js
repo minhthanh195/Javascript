@@ -265,9 +265,7 @@ function handleMoveOnMobile(e) {
 
   if (target.classList.contains('drag-select-btn') && target.closest('.drag-select-list')) {
     const index = target.getAttribute('data-move');
-
-    // const positionColumn = listColumns[index].closest('.drag-column').offsetTop;
-    // window.scrollTo(0, positionColumn);
+    
     popup.style.display = 'none';
     handleSelectActiveOption(index);
     listColumns[index].appendChild(draggingItem);

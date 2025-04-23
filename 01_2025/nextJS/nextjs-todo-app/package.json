@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@supabase/supabase-js": "^2.49.4",
     "@tailwindcss/cli": "^4.1.0",
     "dayjs": "^1.11.13",
     "next": "15.2.4",

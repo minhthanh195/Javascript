@@ -1,125 +1,138 @@
-import { useEffect, useRef, useState } from 'react'
-import { Todo } from '@/types/todo'
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { Todo } from "@/types/todo";
+import { supabase } from "@/lib/supabase";
 
 export function useTodoManager(currentGroup: string) {
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [deletedTodos, setDeletedTodos] = useState<Todo[]>([])
-  const [loading, setLoading] = useState(true)
-  const undoTimers = useRef<Record<number, NodeJS.Timeout>>({})
-  const [error, setError] = useState(false)
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [deletedTodos, setDeletedTodos] = useState<Todo[]>([]);
+  const undoTimers = useRef<Record<number, NodeJS.Timeout>>({});
 
   useEffect(() => {
-    fetch('/api/todos')
-      .then(res => res.json())
-      .then(data => setTodos(data))
-      .catch(err => {
-        console.error('Lỗi gọi API:', err)
-        setError(true)
-      })
-      .finally(() => setLoading(false))
-  }, [])
+    const fetchTodos = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("todos")
+        .select("*")
+        .eq("group", currentGroup)
+        .order("createdAt", { ascending: false });
 
-  useEffect(() => {
-    const saved = localStorage.getItem(`todos_${currentGroup}`)
-    if (saved) {
-      setTodos(JSON.parse(saved))
-    } else {
-      setTodos([])
-    }
-  }, [currentGroup])
+      if (error) {
+        console.error("Lỗi fetch Supabase:", error.message);
+        setError(true);
+      } else {
+        setTodos(data as Todo[]);
+      }
+      setLoading(false);
+    };
 
-  useEffect(() => {
-    if (todos.length === 0) return
-    localStorage.setItem(`todos_${currentGroup}`, JSON.stringify(todos))
-
-    const updateTodos = async () => {
-      await fetch('/api/todos', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(todos),
-      })
-    }
-
-    updateTodos()
-  }, [todos, currentGroup])
+    fetchTodos();
+  }, [currentGroup]);
 
   const addTodo = async (todo: Todo) => {
-    await fetch('/api/todos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(todo),
-    })
-    setTodos(prev => [todo, ...prev])
-  }
+    const { error } = await supabase.from("todos").insert([todo]);
+    if (error) {
+      console.error("Lỗi thêm todo:", error.message);
+    } else {
+      setTodos((prev) => [todo, ...prev]);
+    }
+  };
 
-  const toggleCompleted = (id: number) => {
-    const updated = todos.map(todo =>
-      todo.id === id
-        ? {
-            ...todo,
-            completed: !todo.completed,
-            completedAt: !todo.completedAt ? new Date().toISOString() : undefined,
-          }
-        : todo
-    )
-    setTodos(updated)
-  }
+  const editTodo = async (id: number, newText: string) => {
+    const { error } = await supabase
+      .from("todos")
+      .update({ text: newText })
+      .eq("id", id);
+
+    if (error) console.error("Lỗi sửa todo:", error.message);
+    else
+      setTodos((prev) =>
+        prev.map((todo) => (todo.id === id ? { ...todo, text: newText } : todo))
+      );
+  };
+
+  const toggleCompleted = async (id: number) => {
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return;
+
+    const updated = {
+      completed: !todo.completed,
+      completedAt: !todo.completedAt ? new Date().toISOString() : undefined,
+    };
+
+    const { error } = await supabase.from("todos").update(updated).eq("id", id);
+
+    if (error) console.error("Lỗi toggle:", error.message);
+    else
+      setTodos((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, ...updated } : t))
+      );
+  };
 
   const deleteTodo = async (id: number) => {
-    const deleted = todos.find(todo => todo.id === id)
-    if (!deleted) return
+    const deleted = todos.find((t) => t.id === id);
+    if (!deleted) return;
 
-    await fetch('/api/todos', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    })
-
-    setDeletedTodos(prev => [deleted, ...prev])
-    setTodos(prev => prev.filter(todo => todo.id !== id))
-
-    const timeout = setTimeout(() => {
-      setDeletedTodos(prev => prev.filter(todo => todo.id !== id))
-      delete undoTimers.current[id]
-    }, 10000)
-
-    undoTimers.current[id] = timeout
-  }
-
-  const editTodo = (id: number, newText: string) => {
-    setTodos(prev =>
-      prev.map(todo => (todo.id === id ? { ...todo, text: newText } : todo))
-    )
-  }
-
-  const clearCompleted = () => {
-    setTodos(prev => prev.filter(todo => !todo.completed))
-  }
-
-  const undoLastDelete = () => {
-    const [last, ...rest] = deletedTodos
-    if (!last) return
-
-    if (undoTimers.current[last.id]) {
-      clearTimeout(undoTimers.current[last.id])
-      delete undoTimers.current[last.id]
+    const { error } = await supabase.from("todos").delete().eq("id", id);
+    if (error) {
+      console.error("Lỗi xoá todo:", error.message);
+      return;
     }
 
-    setTodos(prev => [...prev, last])
-    setDeletedTodos(rest)
-  }
+    setDeletedTodos((prev) => [deleted, ...prev]);
+    setTodos((prev) => prev.filter((t) => t.id !== id));
+
+    const timeout = setTimeout(() => {
+      setDeletedTodos((prev) => prev.filter((t) => t.id !== id));
+      delete undoTimers.current[id];
+    }, 10000);
+
+    undoTimers.current[id] = timeout;
+  };
+
+  const undoLastDelete = async () => {
+    const [last, ...rest] = deletedTodos;
+    if (!last) return;
+
+    if (undoTimers.current[last.id]) {
+      clearTimeout(undoTimers.current[last.id]);
+      delete undoTimers.current[last.id];
+    }
+
+    const { error } = await supabase.from("todos").insert([last]);
+    if (error) {
+      console.error("Lỗi undo:", error.message);
+      return;
+    }
+
+    setTodos((prev) => [last, ...prev]);
+    setDeletedTodos(rest);
+  };
+
+  const clearCompleted = async () => {
+    const { error } = await supabase
+      .from("todos")
+      .delete()
+      .eq("group", currentGroup)
+      .eq("completed", true);
+
+    if (error) console.error("Lỗi xoá completed:", error.message);
+    else setTodos((prev) => prev.filter((t) => !t.completed));
+  };
 
   return {
     todos,
-    deletedTodos,
     loading,
     error,
+    deletedTodos,
     addTodo,
+    editTodo,
     toggleCompleted,
     deleteTodo,
-    editTodo,
     clearCompleted,
     undoLastDelete,
     setTodos,
-  }
+  };
 }
